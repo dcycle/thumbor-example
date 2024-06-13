@@ -1,6 +1,8 @@
 Thumbor example
 -----
 
+Run ./scripts/deploy.sh to get an example of how to use [Thumbor](https://www.thumbor.org/) to optimize images for any website.
+
 Resources
 -----
 * [Use image CDNs to optimize images, by Jeremy Wagner et al., 2019-08-14, on web.dev](https://web.dev/articles/image-cdns)
