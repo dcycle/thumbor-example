@@ -1,0 +1,14 @@
+---
+services:
+  image_optimization:
+    # https://hub.docker.com/r/minimalcompact/thumbor
+    ports:
+      - "8705:80"
+    image: minimalcompact/thumbor:6.7.5
+
+  webserver:
+    image: httpd
+    ports:
+      - "8706:80"
+    volumes:
+      - "./website-with-large-image:/usr/local/apache2/htdocs/"
