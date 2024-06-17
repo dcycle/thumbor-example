@@ -1,3 +1,5 @@
+[![CircleCI](https://dl.circleci.com/status-badge/img/gh/dcycle/thumbor-example/tree/master.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/dcycle/thumbor-example/tree/master)
+
 Thumbor example
 -----
 
