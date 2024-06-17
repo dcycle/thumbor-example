@@ -6,7 +6,18 @@ services:
       - "8705:80"
     image: minimalcompact/thumbor:6.7.5
     environment:
-      ALLOWED_SOURCES: "['webserver']"  # Specify the allowed source
+      # The virtual host is used when we want to access our site via an
+      # Nginx Proxy locally; and is required by the script
+      # ./scripts/https-deploy.sh.
+      # See https://blog.dcycle.com/blog/2018-10-27 for details.
+      # See also https://blog.dcycle.com/blog/7f3ea9e1/
+      # See also https://blog.dcycle.com/blog/170a6078/
+      VIRTUAL_HOST: ${VIRTUAL_HOST}
+      LETSENCRYPT_HOST: ${VIRTUAL_HOST}
+      LETSENCRYPT_EMAIL: "letsencrypt@${VIRTUAL_HOST}"
+      # Specify the allowed source.
+      # See .env file
+      ALLOWED_SOURCES: "$ALLOWED_SOURCES"
 
   webserver:
     image: httpd

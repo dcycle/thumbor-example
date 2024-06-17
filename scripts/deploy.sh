@@ -7,6 +7,10 @@ set -e
 docker pull minimalcompact/thumbor:6.7.5
 docker pull httpd
 
+if [ ! -f .env ]; then
+  cp .env-example .env
+fi
+
 docker compose up -d --build
 
 WEBSERVER=$(docker compose port webserver 80)
