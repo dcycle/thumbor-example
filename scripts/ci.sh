@@ -6,6 +6,10 @@ set -e
 
 ./scripts/deploy.sh
 
+echo "We need to wait awhile before accessing the resource"
+
+sleep 10
+
 echo "Confirming that we can get an image from webserver"
 
 curl -I http://0.0.0.0:8705/unsafe/500x/webserver/large-image.jpg | grep 200
