@@ -5,35 +5,6 @@ Thumbor example
 
 Run ./scripts/deploy.sh to get an example of how to use [Thumbor](https://www.thumbor.org/) to optimize images for any website.
 
-Running this on a server
------
-
-Make sure images.example.com points to your server, for example 1.2.3.4.
-
-Then once on your server run:
-
-    DOMAIN=images.example.com
-    docker pull minimalcompact/thumbor:6.7.5
-    docker run -d \
-      -e ALLOWED_SOURCES="['example.org', 'www.example.org']" \
-      -e "VIRTUAL_HOST=$DOMAIN" \
-      -e "LETSENCRYPT_HOST=$DOMAIN" \
-      -e "LETSENCRYPT_EMAIL=$DOMAIN" \
-      --expose 80 --name thumbor \
-      minimalcompact/thumbor:6.7.5
-
-Then figure out what network your container is in:
-
-    docker container inspect thumbor
-
-The network will look like "bridge" or "example_bridge".
-
-    NETWORK=bridge
-
-
-    DOMAIN=images.example.com
-
-
 Resources
 -----
 * [Use image CDNs to optimize images, by Jeremy Wagner et al., 2019-08-14, on web.dev](https://web.dev/articles/image-cdns)
