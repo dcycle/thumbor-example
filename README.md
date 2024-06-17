@@ -5,6 +5,32 @@ Thumbor example
 
 Run ./scripts/deploy.sh to get an example of how to use [Thumbor](https://www.thumbor.org/) to optimize images for any website.
 
+Running this on a server
+-----
+
+Make sure images.example.com points to your server, for example 1.2.3.4.
+
+Then once on your server run:
+
+    git clone https://github.com/dcycle/thumbor-example.git thumbor
+    cd thumbor
+    ./scripts/deploy.sh
+
+Then edit the ~/thumbor/.env file and put in there:
+
+    VIRTUAL_HOST=images.example.com
+    ALLOWED_SOURCES=['example.com', 'www.example.com']
+
+Now, again, run
+
+    ./scripts/deploy.sh
+
+Now follow the instructions at [Letsencrypt HTTPS for Drupal on Docker, Dcycle Blog, Oct. 3, 2017](https://blog.dcycle.com/blog/170a6078/letsencrypt-drupal-docker/) and [Deploying Letsencrypt with Docker-Compose, Dcycle Blog, Oct. 6, 2017](https://blog.dcycle.com/blog/7f3ea9e1/letsencrypt-docker-compose/) to enable LetsEncrypt.
+
+Now you can visit:
+
+    https://images.example.com/unsafe/500x/example.com/path/to/large.jpg
+
 Resources
 -----
 * [Use image CDNs to optimize images, by Jeremy Wagner et al., 2019-08-14, on web.dev](https://web.dev/articles/image-cdns)
