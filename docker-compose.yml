@@ -5,10 +5,19 @@ services:
     ports:
       - "8705:80"
     image: minimalcompact/thumbor:6.7.5
+    environment:
+      ALLOWED_SOURCES: "['webserver']"  # Specify the allowed source
 
   webserver:
     image: httpd
     ports:
       - "8706:80"
+    volumes:
+      - "./website-with-large-image:/usr/local/apache2/htdocs/"
+
+  webserver_no_access:
+    image: httpd
+    ports:
+      - "8707:80"
     volumes:
       - "./website-with-large-image:/usr/local/apache2/htdocs/"
