@@ -14,3 +14,10 @@ services:
       - "8706:80"
     volumes:
       - "./website-with-large-image:/usr/local/apache2/htdocs/"
+
+  webserver_no_access:
+    image: httpd
+    ports:
+      - "8707:80"
+    volumes:
+      - "./website-with-large-image:/usr/local/apache2/htdocs/"
