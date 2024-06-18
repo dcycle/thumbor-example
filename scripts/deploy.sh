@@ -36,6 +36,10 @@ secure_url=$(generate_thumbor_secure_url "$unsafe_url_part")
 
 complete_secure_url="http://$OPTIMIZATION/$secure_url/$unsafe_url_part"
 
+ls -la
+
+pwd
+
 # Replace image src in optimized.html with secure URL
 sed -i "" "s|http://$OPTIMIZATION/unsafe/500x/webserver/large-image.jpg|$complete_secure_url|g" website-with-large-image/optimized.html
 
