@@ -46,6 +46,10 @@ Destroying your environment
     docker compose down -v
     rm .env
 
+Thumbor Service Security Implementation.
+-----
+* Kindly refer [Thumbor Security doc](https://thumbor.readthedocs.io/en/latest/security.html)
+
 Resources
 -----
 * [Use image CDNs to optimize images, by Jeremy Wagner et al., 2019-08-14, on web.dev](https://web.dev/articles/image-cdns)
