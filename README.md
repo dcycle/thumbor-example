@@ -31,6 +31,21 @@ Now you can visit:
 
     https://images.example.com/unsafe/500x/example.com/path/to/large.jpg
 
+Updating your environment
+-----
+
+Run
+
+    ./scripts/deploy.sh
+
+In case of issues, you might want to confirm that the unversioned `./.env` file at the root of this directory has the same variables as the versioned `./.env-example`. For example, if you have deployed a previous version of this project which did not include the `THUMBOR_SECURITY_KEY` in `./env-example`, and you are upgrading, your `./.env` file might not contain `THUMBOR_SECURITY_KEY` and you will have to add it manually.
+
+Destroying your environment
+-----
+
+    docker compose down -v
+    rm .env
+
 Resources
 -----
 * [Use image CDNs to optimize images, by Jeremy Wagner et al., 2019-08-14, on web.dev](https://web.dev/articles/image-cdns)
