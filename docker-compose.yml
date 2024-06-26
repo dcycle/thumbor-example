@@ -17,7 +17,9 @@ services:
       LETSENCRYPT_EMAIL: "letsencrypt@${VIRTUAL_HOST}"
       # Specify the allowed source.
       # See .env file
+      ALLOW_UNSAFE_URL: "$ALLOW_UNSAFE_URL"
       ALLOWED_SOURCES: "$ALLOWED_SOURCES"
+      SECURITY_KEY: "$THUMBOR_SECURITY_KEY"
 
   webserver:
     image: httpd

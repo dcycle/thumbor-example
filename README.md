@@ -20,6 +20,10 @@ Then edit the ~/thumbor/.env file and put in there:
 
     VIRTUAL_HOST=images.example.com
     ALLOWED_SOURCES=['example.com', 'www.example.com']
+    THUMBOR_SECURITY_KEY=your_thumbor_security_key_here
+    ALLOW_UNSAFE_URL=False
+
+Change your_thumbor_security_key_here to an arbitrary string.
 
 Now, again, run
 
@@ -29,7 +33,34 @@ Now follow the instructions at [Letsencrypt HTTPS for Drupal on Docker, Dcycle B
 
 Now you can visit:
 
-    https://images.example.com/unsafe/500x/example.com/path/to/large.jpg
+    https://images.example.com/3DW-hfnrLS8eunvhonsNJe6S79I=/500x/webserver/large-image.jpg
+
+### Where does "3DW-hfnrLS8eunvhonsNJe6S79I=" come from?
+
+As explained in the [Thumbor Security document](https://thumbor.readthedocs.io/en/latest/security.html), you can get this by running:
+
+    source ./scripts/lib/generate_thumbor_secure_url.source.sh
+    source .env
+    unsafe_url_part=500x/webserver/large-image.jpg
+    key=$THUMBOR_SECURITY_KEY
+    generate_thumbor_secure_url "$unsafe_url_part" "$key"
+
+In other words the individual security key (3DW-hfnrLS8eunvhonsNJe6S79I) is created by hashing the unsafe URL part (500x/webserver/large-image.jpg, or 500x/www.example.com/large-image.jpg) and the global security key (your_thumbor_security_key_here); the URL-specific security key will be different for each image.
+
+Updating your environment
+-----
+
+Run
+
+    ./scripts/deploy.sh
+
+In case of issues, you might want to confirm that the unversioned `./.env` file at the root of this directory has the same variables as the versioned `./.env-example`. For example, if you have deployed a previous version of this project which did not include the `THUMBOR_SECURITY_KEY` in `./env-example`, and you are upgrading, your `./.env` file might not contain `THUMBOR_SECURITY_KEY` and you will have to add it manually.
+
+Destroying your environment
+-----
+
+    docker compose down -v
+    rm .env
 
 Resources
 -----
