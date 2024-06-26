@@ -20,6 +20,10 @@ Then edit the ~/thumbor/.env file and put in there:
 
     VIRTUAL_HOST=images.example.com
     ALLOWED_SOURCES=['example.com', 'www.example.com']
+    THUMBOR_SECURITY_KEY=your_thumbor_security_key_here
+    ALLOW_UNSAFE_URL=False
+
+Change your_thumbor_security_key_here to an arbitrary string.
 
 Now, again, run
 
@@ -29,7 +33,19 @@ Now follow the instructions at [Letsencrypt HTTPS for Drupal on Docker, Dcycle B
 
 Now you can visit:
 
-    https://images.example.com/unsafe/500x/example.com/path/to/large.jpg
+    https://images.example.com/3DW-hfnrLS8eunvhonsNJe6S79I=/500x/webserver/large-image.jpg
+
+### Where does "3DW-hfnrLS8eunvhonsNJe6S79I=" come from?
+
+As explained in the [Thumbor Security document](https://thumbor.readthedocs.io/en/latest/security.html), you can get this by running:
+
+    source ./scripts/lib/generate_thumbor_secure_url.source.sh
+    source .env
+    unsafe_url_part=500x/webserver/large-image.jpg
+    key=$THUMBOR_SECURITY_KEY
+    generate_thumbor_secure_url "$unsafe_url_part" "$key"
+
+In other words the individual security key (3DW-hfnrLS8eunvhonsNJe6S79I) is created by hashing the unsafe URL part (500x/webserver/large-image.jpg, or 500x/www.example.com/large-image.jpg) and the global security key (your_thumbor_security_key_here); the URL-specific security key will be different for each image.
 
 Updating your environment
 -----
@@ -45,10 +61,6 @@ Destroying your environment
 
     docker compose down -v
     rm .env
-
-Thumbor Service Security Implementation.
------
-* Kindly refer [Thumbor Security doc](https://thumbor.readthedocs.io/en/latest/security.html)
 
 Resources
 -----
