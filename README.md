@@ -47,6 +47,56 @@ As explained in the [Thumbor Security document](https://thumbor.readthedocs.io/e
 
 In other words the individual security key (3DW-hfnrLS8eunvhonsNJe6S79I) is created by hashing the unsafe URL part (500x/webserver/large-image.jpg, or 500x/www.example.com/large-image.jpg) and the global security key (your_thumbor_security_key_here); the URL-specific security key will be different for each image.
 
+Creating a map of unoptimized to optimized images
+-----
+
+Imagine you have a static website whose source code is all public. In such a case, you cannot store the Thumbor security key (in this example, `your_thumbor_security_key_here`), because it cannot be accessible to the public.
+
+One solution might be:
+
+* Every time your source code changes, have a a Jenkins job scan your website source code for all images.
+* Use a script which uses the Thumbor security key as a secret, hidden from the public, to map all unoptimized images to optimized images.
+* Create a json file with said mapping, which can be publicly available separately, or within, the website, which looks like this:
+
+    {
+        "/500x/webserver/large-image.jpg": "3DW-hfnrLS8eunvhonsNJe6S79I=",
+        ...
+    }
+
+In this example:
+
+* *500x* is the desired size of the optimized image, in this case 500 pixels wide;
+* *webserver* is the name of the server as seen from within the Docker container hosting Thumbor. In real-world cases, this will be a domain such as `www.example.com`. In test scenarios, it can be the name of the Docker container as defined in `./docker-compose.yml`.
+* *large-image.jpg* is the path to the unoptimized image.
+* *3DW-hfnrLS8eunvhonsNJe6S79I* is the hash, as described in the section "Running this on a server", above.
+
+Let us imagine that this JSON file is available somewhere such as `https://image-mapping.example.com/image-mapping.json`.
+
+Now, the page `https://example.com/index.html` might reference an image such as `<img src="/large-image.jpg" />`. Instead of loading `./large-image.jpg` (which is unoptimized and might be very large) directly, the page might include a JavaScript file which fetches `https://image-mapping.example.com/image-mapping.json` and looks for whether the key `"/500x/example.com/large-image.jpg"` exists, and if it does, look for the value associated with that key, which is the token that should be used (let's say it's `3DW-hfnrLS8eunvhonsNJe6S79I`).
+
+### If the token exists in the mapping file
+
+Then replace:
+
+    <img src="/large-image.jpg" />
+
+with:
+
+    <img src="https://images.example.com/3DW-hfnrLS8eunvhonsNJe6S79I/500x/example.com/large-image.jpg" />
+
+### If the token does not exist
+
+Then load the original file.
+
+### How to generate the mapping file
+
+The python script ./generate-image-map.py can be used to generate the mapping.
+
+Here is how to use a Dockerized version of that script:
+
+    export THUMBOR_SECURITY_KEY=your_thumbor_security_key_here
+    ./generate-image-map.sh ./ webserver 500x ./unversioned/test.json
+
 Updating your environment
 -----
 
