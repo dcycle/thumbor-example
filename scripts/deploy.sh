@@ -13,6 +13,15 @@ fi
 
 source .env
 
+echo ''
+echo '-----'
+echo 'About to create the thumbor_example_default_network network if it does'
+echo 'not exist, echo 'because we need it to have a predictable name when we
+echo 'try to connect other containers to it (for example testers).'
+echo 'thumbor_example_default_network is then referenced in docker-compose.yml.'
+echo 'See https://github.com/docker/compose/issues/3736.'
+docker network ls | grep thumbor_example_default_network || docker network create thumbor_example_default_network
+
 docker compose up -d --build
 
 WEBSERVER=$(docker compose port webserver 80)
@@ -25,10 +34,6 @@ unsafe_url_part="500x/webserver/large-image.jpg"
 key=$THUMBOR_SECURITY_KEY
 
 # Generate secure URL
-echo "A"
-echo "$unsafe_url_part"
-echo "$key"
-echo "B"
 secure_key=$(generate_thumbor_secure_url "$unsafe_url_part" "$key")
 
 complete_secure_url="http://$OPTIMIZATION/$secure_key/$unsafe_url_part"

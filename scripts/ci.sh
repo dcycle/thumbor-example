@@ -26,4 +26,14 @@ echo "Confirming that we cannot get an image from other sources"
 
 curl -I http://0.0.0.0:8705/unsafe/500x/webserver_no_access/large-image.jpg | grep 400
 
+echo "Confirming that we can generate an unoptimized-to-optimized image map"
+
+source .env
+export THUMBOR_SECURITY_KEY="$THUMBOR_SECURITY_KEY"
+./scripts/generate-image-map.sh ./app/website-with-large-image webserver 200x ./app/unversioned/image-map.json
+
+echo "Confirming that the unoptimized-to-optimized script works as expected"
+
+./scripts/generated-image-map-test.sh
+
 echo "All done with tests!"

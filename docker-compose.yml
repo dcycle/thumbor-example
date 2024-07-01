@@ -34,3 +34,12 @@ services:
       - "8707:80"
     volumes:
       - "./website-with-large-image:/usr/local/apache2/htdocs/"
+
+# Specifying the network name makes it predictable to other scripts, for
+# example ./scripts/generated-image-map-test.sh expects the network to be
+# named thumbor_example_default_network.
+# See https://github.com/docker/compose/issues/3736.
+networks:
+  default:
+    name: thumbor_example_default_network
+    external: true
