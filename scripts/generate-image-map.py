@@ -1,8 +1,4 @@
-#
-# Usage:
-#
 # export THUMBOR_SECURITY_KEY=your_thumbor_security_key_here
-# [optional] export GENERATE_IMAGE_MAP_SHELL=/bin/sh (default: /bin/bash)
 # ./scripts/generate-iamge-map.sh \
 #    /path/to/images/directory \
 #    you.server.with.unoptimized.images.example.com \
@@ -13,87 +9,120 @@
 # contain a JSON object with the mapping of the original image URLs, like this:
 #
 #    {
-#        "/500x/webserver/large-image.jpg": "3DW-hfnrLS8eunvhonsNJe6S79I=",
+#        "large-image.jpg": "3DW-hfnrLS8eunvhonsNJe6S79I=/500x/webserver/large-image.jpg",
 #        ...
 #    }
 #
 
-import subprocess
 import os
 import sys
 import json
-from pathlib import Path
 from dotenv import load_dotenv
+from libthumbor import CryptoURL
 
 # Assuming the .env file is in the project root
 dotenv_path = os.path.join(os.path.dirname(__file__), '..', '.env')
 load_dotenv(dotenv_path)
 
-# This script needs to know which shell to use. By default it will use /bin/bash
-# but if you are running this in Alpine linux for example, /bin/bash is not
-# available, so you are prepend the call to this script with
-# export GENERATE_IMAGE_MAP_SHELL=/bin/sh as can be seen in
-# ./scripts/generate-image-map.sh.
-shell_to_use = os.getenv('GENERATE_IMAGE_MAP_SHELL') if os.getenv('GENERATE_IMAGE_MAP_SHELL') else "/bin/bash";
+# We are passing size argument as 200x or 200x300 or x400.
+# We need to exctract width and height from size.
+def extract_width_height(size):
+    # Default values
+    width = None
+    height = None
 
-def generate_thumbor_secure_url(unsafe_url_part, security_key):
-    script_path = os.path.abspath('./scripts/lib/generate_thumbor_secure_url.source.sh')
-    command = f'source {script_path} && generate_thumbor_secure_url "{unsafe_url_part}" "{security_key}"'
+    if size:
+        parts = size.split('x')
+        if len(parts) == 2:
+            if parts[0]:
+                width = int(parts[0])
+            if parts[1]:
+                height = int(parts[1])
+        elif len(parts) == 1 and parts[0]:
+            if parts[0].isdigit():
+                width = int(parts[0])
+            else:
+                height = int(parts[0])
 
-    try:
-        result = subprocess.check_output(command, shell=True, executable=shell_to_use)
-        secure_key = result.decode('utf-8').strip()
-        return secure_key
-    except subprocess.CalledProcessError as e:
-        print(f"Error running shell script: {e}")
-        return None
+    return width, height
+
+# We are generating secure url part.
+# Ex:- /v4N0hVTSDSUhTyej8TYfSK2BLfw=/200x0/smart/webserver/img_20230202_121358_113.jpg
+def generate_secure_token(width, height, key, path):
+    crypto = CryptoURL(key)
+
+    options = {
+        'smart': True,
+        'image_url': path
+    }
+
+    if width is not None:
+        options['width'] = width
+    if height is not None:
+        options['height'] = height
+
+    encrypted_url = crypto.generate(**options)
+    return encrypted_url
 
 def main():
-    # Check if all arguments are provided
     if len(sys.argv) != 5:
-        print("Usage: python3 ./scripts/generate-image-map2.py <images_directory> <server_domain> <size> <output_json_file>")
+        print("Usage: python3 generate-image-map.py <images_directory> <server_domain> <size> <mapping_file>")
         sys.exit(1)
 
     images_directory = sys.argv[1]
     server_domain = sys.argv[2]
     size = sys.argv[3]
-    output_json_file = sys.argv[4]
+    mapping_file = sys.argv[4]
 
-    # Check if the images directory exists
-    if not os.path.isdir(images_directory):
-        print(f"Error: Directory '{images_directory}' does not exist.")
-        sys.exit(1)
-
-    print(f"Directory '{images_directory}' exists. Generating image map...")
-
-    # Ensure the output JSON file exists or create it as an empty object {}
-    output_json_path = Path(output_json_file)
-    if not output_json_path.exists():
-        output_json_path.write_text("{}")
-
+    # Read security key from environment variable
     security_key = os.getenv('THUMBOR_SECURITY_KEY')
     if not security_key:
         print("Error: THUMBOR_SECURITY_KEY environment variable is not set.")
         sys.exit(1)
 
-    # Iterate over images in the directory
-    image_map = {}
-    for filename in os.listdir(images_directory):
-        if filename.lower().endswith(('.jpg', '.jpeg', '.png')):
-            print(f"Processing image: {filename}")
-            # Construct the unsafe URL part
-            unsafe_url_part = f"{size}/{server_domain}/{filename}"
-            # Generate secure URL using shell script
-            securekey = generate_thumbor_secure_url(unsafe_url_part, security_key)
-            if securekey:
-                # Store in the image map dictionary
-                image_map[unsafe_url_part] = securekey
+    # Ensure the images directory exists
+    if not os.path.isdir(images_directory):
+        print(f"Error: Images directory '{images_directory}' not found.")
+        sys.exit(1)
 
-    # Write the image map dictionary to the output JSON file
-    with open(output_json_file, 'w') as f:
-        json.dump(image_map, f, indent=2)
+    # Ensure mapping_file path is valid
+    mapping_file_dir = os.path.dirname(mapping_file)
+    if not os.path.isdir(mapping_file_dir):
+        print(f"Directory for mapping file '{mapping_file_dir}' does not exist.")
+        sys.exit(1)
 
-    print(f"Image map successfully generated and saved to {output_json_file}")
+    # Ensure mapping_file exists or create an empty JSON object
+    if os.path.isfile(mapping_file):
+        print(f"Mapping file '{mapping_file}' exists. Emptying its contents...")
+        with open(mapping_file, 'w') as f:
+            json.dump({}, f)
+    else:
+        print(f"Mapping file '{mapping_file}' does not exist. Creating an empty JSON file...")
+        with open(mapping_file, 'w') as f:
+            json.dump({}, f)
+
+    width, height = extract_width_height(size)
+
+    # Prepare to update the mapping JSON
+    with open(mapping_file, 'r+') as f:
+        mapping_data = json.load(f)
+
+        # Iterate over images in the directory
+        for root, _, files in os.walk(images_directory):
+            for file in files:
+                # Check if file is an image (ignoring case)
+                if file.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tiff')):
+                    image_path = os.path.join(root, file)
+                    relative_path = os.path.relpath(image_path, images_directory)
+                    secure_token = generate_secure_token(width, height, security_key, f"{server_domain}/{relative_path}")
+                    mapping_data[f"/{relative_path}"] = secure_token
+
+        # Write updated mapping data to the file
+        f.seek(0)
+        json.dump(mapping_data, f, indent=2)
+        f.truncate()
+
+    print(f"Image mapping successfully updated in {mapping_file}")
 
 if __name__ == "__main__":
     main()
