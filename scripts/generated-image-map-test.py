@@ -1,3 +1,5 @@
+print("---- Starting test ----")
+
 import os
 import sys
 import subprocess
