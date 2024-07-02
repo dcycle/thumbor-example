@@ -28,9 +28,11 @@ curl -I http://0.0.0.0:8705/unsafe/500x/webserver_no_access/large-image.jpg | gr
 
 echo "Confirming that we can generate an unoptimized-to-optimized image map"
 
+OPTIMIZATION=$(docker compose port image_optimization 80)
+
 source .env
 export THUMBOR_SECURITY_KEY="$THUMBOR_SECURITY_KEY"
-./scripts/generate-image-map.sh ./app/website-with-large-image webserver 200x ./app/unversioned/image-map.json
+./scripts/generate-image-map.sh ./app/website-with-large-image webserver 200x ./app/website-with-large-image/unversioned-image-mapping.json 0.0.0.0:8705 OPTIMIZATION
 
 echo "Confirming that the unoptimized-to-optimized script works as expected"
 
