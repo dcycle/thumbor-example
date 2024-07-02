@@ -4,8 +4,8 @@
 #
 set -e
 
-if [ ! -f ./app/website-with-large-image/unversioned-image-mapping.json ]; then
-  echo "./app/website-with-large-image/unversioned-image-mapping.json not found. Please run the script that generates it (./scripts/generate-image-map.sh) first."
+if [ ! -f ./website-with-large-image/unversioned-image-mapping.json ]; then
+  echo "./website-with-large-image/unversioned-image-mapping.json not found. Please run the script that generates it (./scripts/generate-image-map.sh) first."
   exit 1
 fi
 

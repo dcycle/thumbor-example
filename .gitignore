@@ -1,4 +1,4 @@
 .DS_Store
 .env
 unversioned
-./website-with-large-image/unversioned-image-mapping.json
+website-with-large-image/unversioned-image-mapping.json

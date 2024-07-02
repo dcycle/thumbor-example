@@ -110,8 +110,9 @@ Destroying your environment
 -----
 
     docker compose down -v
-    rm .env
-    docker network rm thumbor_example_default_network || true
+    rm -f .env
+    rm -f ./website-with-large-image/unversioned-image-mapping.json
+    docker network rm thumbor_example_default_network 2>/dev/null || true
 
 Resources
 -----
