@@ -9,7 +9,7 @@ if [ ! -f ./unversioned/image-map.json ]; then
   exit 1
 fi
 
-echo "Confirming that all safe url path and signtured generated in unversioned/image-map.json are accessible"
+echo "Confirming that all safe url path and signtured generated in /app/website-with-large-image/unversioned-image-mapping.json are accessible"
 
 # Note that the second argument is the host and port of the server that will be
 # used to test the URLs. In the case of our test it is 0.0.0.0:8705, however
