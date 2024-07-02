@@ -23,7 +23,7 @@ echo "Confirming that all safe url path and signtured generated in unversioned/i
 output=$(docker run -v $(pwd):/app \
   --network thumbor_example_default_network \
   --rm --entrypoint /bin/sh python:3-alpine -c \
-  "pip install requests && python3 /app/scripts/generated-image-map-test.py /app/unversioned/image-map.json image_optimization")
+  "pip install requests && python3 /app/scripts/generated-image-map-test.py /app/unversioned/image-map.json ")
 
 # Check the content of the output
 if echo "$output" | grep -q "400"; then

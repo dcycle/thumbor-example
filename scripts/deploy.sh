@@ -38,12 +38,6 @@ secure_key=$(generate_thumbor_secure_url "$unsafe_url_part" "$key")
 
 complete_secure_url="http://$OPTIMIZATION/$secure_key/$unsafe_url_part"
 
-# Create a backup file and replace the image src in optimized.html with secure URL
-sed -i.bak "s|http://$OPTIMIZATION/unsafe/500x/webserver/large-image.jpg|$complete_secure_url|g" website-with-large-image/optimized.html
-
-# Remove the backup file
-rm website-with-large-image/optimized.html.bak
-
 echo " => "
 echo " => All done!"
 echo " => "

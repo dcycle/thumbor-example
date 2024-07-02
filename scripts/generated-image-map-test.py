@@ -9,7 +9,7 @@ from urllib.parse import quote
 
 # pip install requests // install requests if you haven't installed it.
 # python3 ./scripts/generated-image-map-test.py unversioned/image-map.json 0.0.0.0:8705
-def test_urls(output_json_file, server_domain):
+def test_urls(output_json_file):
     try:
         with open(output_json_file, 'r') as f:
             image_map = json.load(f)
@@ -24,7 +24,7 @@ def test_urls(output_json_file, server_domain):
     all_accessible = True  # Flag to track if all URLs are accessible
 
     for unsafe_url_part, secure_url in image_map.items():
-        full_url = f"http://{server_domain}{quote(secure_url)}"
+        full_url = f"{quote(secure_url)}"
         try:
             response = requests.get(full_url)
             if response.status_code != 200:
