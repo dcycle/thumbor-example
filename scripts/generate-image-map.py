@@ -73,6 +73,14 @@ def extract_width_height(size):
 # Ex:- /v4N0hVTSDSUhTyej8TYfSK2BLfw=/200x0/smart/webserver/img_20230202_121358_113.jpg
 def generate_secure_token(width, height, key, path):
     crypto = CryptoURL(key)
+
+# Smart Cropping¶
+# If the smart mode of thumbor has been specified in the uri (by the /smart portion of it),
+# thumbor will use it’s smart detectors to find focal points.
+# thumbor comes pre-packaged with two focal-point detection algorithms: facial and feature.
+# First it tries to identify faces and if it can’t find any, it tries to identify 
+# features (more on that below).
+# https://thumbor.readthedocs.io/en/latest/detection_algorithms.html
     options = {'smart': True, 'image_url': path}
     if width is not None:
         options['width'] = width
@@ -89,7 +97,7 @@ def update_mapping_data(images_directory, server_domain, width, height, mapping_
                     image_path = os.path.join(root, file)
                     relative_path = os.path.relpath(image_path, images_directory)
                     secure_token = generate_secure_token(width, height, security_key, f"{server_domain}/{relative_path}")
-                    mapping_data[f"/{relative_path}"] = secure_token
+                    mapping_data[f"/{relative_path}"] = f"{secure_token}"
         f.seek(0)
         json.dump(mapping_data, f, indent=2)
         f.truncate()

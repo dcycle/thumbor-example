@@ -4,12 +4,12 @@
 #
 set -e
 
-if [ ! -f ./unversioned/image-map.json ]; then
-  echo "unversioned/image-map.json not found. Please run the script that generates it (./scripts/generate-image-map.sh) first."
+if [ ! -f ./website-with-large-image/unversioned-image-mapping.json ]; then
+  echo "./website-with-large-image/unversioned-image-mapping.json not found. Please run the script that generates it (./scripts/generate-image-map.sh) first."
   exit 1
 fi
 
-echo "Confirming that all safe url path and signtured generated in unversioned/image-map.json are accessible"
+echo "Confirming that all safe url path and signtures generated in /website-with-large-image/unversioned-image-mapping.json are accessible"
 
 # Note that the second argument is the host and port of the server that will be
 # used to test the URLs. In the case of our test it is 0.0.0.0:8705, however
@@ -20,10 +20,12 @@ echo "Confirming that all safe url path and signtured generated in unversioned/i
 # 0.0.0.0:8705 is accessible through the name "image_optimization" (see the
 # docker-compose.yml file), and this requires that our Docker script be able to
 # access the same network as is used by our docker-compose.yml file.
+
 output=$(docker run -v $(pwd):/app \
   --network thumbor_example_default_network \
   --rm --entrypoint /bin/sh python:3-alpine -c \
-  "pip install requests && python3 /app/scripts/generated-image-map-test.py /app/unversioned/image-map.json image_optimization")
+  "pip install requests && python3 /app/scripts/generated-image-map-test.py ./app/website-with-large-image/unversioned-image-mapping.json image_optimization")
+
 
 # Check the content of the output
 if echo "$output" | grep -q "400"; then
