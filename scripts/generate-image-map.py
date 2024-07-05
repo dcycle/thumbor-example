@@ -21,8 +21,8 @@ from dotenv import load_dotenv
 from libthumbor import CryptoURL
 
 def check_arguments():
-    if len(sys.argv) != 6:
-        print("Usage: python3 generate-image-map.py <images_directory> <server_domain> <size> <mapping_file> <thumbor_service_domain>")
+    if len(sys.argv) != 5:
+        print("Usage: python3 generate-image-map.py <images_directory> <server_domain> <size> <mapping_file>")
         sys.exit(1)
 
 def load_environment_variables():
@@ -80,7 +80,7 @@ def generate_secure_token(width, height, key, path):
         options['height'] = height
     return crypto.generate(**options)
 
-def update_mapping_data(images_directory, server_domain, width, height, mapping_file, security_key, thumbor_service_domain):
+def update_mapping_data(images_directory, server_domain, width, height, mapping_file, security_key):
     with open(mapping_file, 'r+') as f:
         mapping_data = json.load(f)
         for root, _, files in os.walk(images_directory):
@@ -89,7 +89,7 @@ def update_mapping_data(images_directory, server_domain, width, height, mapping_
                     image_path = os.path.join(root, file)
                     relative_path = os.path.relpath(image_path, images_directory)
                     secure_token = generate_secure_token(width, height, security_key, f"{server_domain}/{relative_path}")
-                    mapping_data[f"/{relative_path}"] = f"http://{thumbor_service_domain}{secure_token}"
+                    mapping_data[f"/{relative_path}"] = f"{secure_token}"
         f.seek(0)
         json.dump(mapping_data, f, indent=2)
         f.truncate()
@@ -100,14 +100,13 @@ def main():
     server_domain = sys.argv[2]
     size = sys.argv[3]
     mapping_file = sys.argv[4]
-    thumbor_service_domain = sys.argv[5]
 
     security_key = load_environment_variables()
     validate_images_directory(images_directory)
     initialize_mapping_file(mapping_file)
 
     width, height = extract_width_height(size)
-    update_mapping_data(images_directory, server_domain, width, height, mapping_file, security_key, thumbor_service_domain)
+    update_mapping_data(images_directory, server_domain, width, height, mapping_file, security_key)
 
     print(f"Image mapping successfully updated in {mapping_file}")
 

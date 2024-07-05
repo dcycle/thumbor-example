@@ -4,6 +4,7 @@
 function loadImages() {
   // Select all <img> elements in the document
   const images = document.querySelectorAll('img');
+  const imageServerDomain = document.getElementById("image-server-domain-id").value;
 
   // Fetch the JSON file once
   fetch('unversioned-image-mapping.json')
@@ -18,8 +19,6 @@ function loadImages() {
           images.forEach(img => {
               // Read data attributes
               const dataSrc = img.getAttribute('data-src');
-              const dataSize = img.getAttribute('data-size');
-              const dataServer = img.getAttribute('data-server');
 
               // Get optimized image URL from mapping data
               const optimizedSrc = mappingData[dataSrc];
@@ -33,7 +32,7 @@ function loadImages() {
               const optimizedURL = `${optimizedSrc}`;
 
               // Update img src with optimized URL
-              img.src = optimizedURL;
+              img.src = imageServerDomain + optimizedURL;
           });
       })
       .catch(error => {
