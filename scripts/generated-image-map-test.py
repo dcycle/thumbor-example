@@ -23,8 +23,8 @@ def test_urls(output_json_file, server_domain):
 
     all_accessible = True  # Flag to track if all URLs are accessible
 
-    for unsafe_url_part, secure_urls in image_map.items():
-        for size, secure_url in secure_urls.items():
+    for unsafe_url_part, sizes in image_map.items():
+        for size, secure_url in sizes.items():
             full_url = f"http://{server_domain}{quote(secure_url)}"
             try:
                 response = requests.get(full_url)

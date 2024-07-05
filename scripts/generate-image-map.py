@@ -69,6 +69,9 @@ def extract_width_height(size):
             height = int(parts[0])
     return width, height
 
+def extract_size(sizes):
+    return sizes.split(',')
+
 # We are generating secure url part.
 # Ex:- /v4N0hVTSDSUhTyej8TYfSK2BLfw=/200x0/smart/webserver/img_20230202_121358_113.jpg
 def generate_secure_token(width, height, key, path):
@@ -80,7 +83,7 @@ def generate_secure_token(width, height, key, path):
         options['height'] = height
     return crypto.generate(**options)
 
-def update_mapping_data(images_directory, server_domain, width, height, mapping_file, security_key):
+def update_mapping_data(images_directory, server_domain, sizes, mapping_file, security_key):
     with open(mapping_file, 'r+') as f:
         mapping_data = json.load(f)
         for root, _, files in os.walk(images_directory):
@@ -88,10 +91,15 @@ def update_mapping_data(images_directory, server_domain, width, height, mapping_
                 if file.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tiff')):
                     image_path = os.path.join(root, file)
                     relative_path = os.path.relpath(image_path, images_directory)
-                    secure_token = generate_secure_token(width, height, security_key, f"{server_domain}/{relative_path}")
-                    mapping_data[f"/{relative_path}"] = {
-                      f"{width}x{height}": secure_token,
-                    }
+                    mapping_data[f"/{relative_path}"] = {}
+                    for size in extract_size(sizes):
+                        width, height = extract_width_height(size)
+                        secure_token = generate_secure_token(width, height, security_key, f"{server_domain}/{relative_path}")
+                        mapping_data[f"/{relative_path}"].update(
+                          {
+                            f"{width}x{height}": secure_token,
+                          }
+                        )
         f.seek(0)
         json.dump(mapping_data, f, indent=2)
         f.truncate()
@@ -100,15 +108,14 @@ def main():
     check_arguments()
     images_directory = sys.argv[1]
     server_domain = sys.argv[2]
-    size = sys.argv[3]
+    sizes = sys.argv[3]
     mapping_file = sys.argv[4]
 
     security_key = load_environment_variables()
     validate_images_directory(images_directory)
     initialize_mapping_file(mapping_file)
 
-    width, height = extract_width_height(size)
-    update_mapping_data(images_directory, server_domain, width, height, mapping_file, security_key)
+    update_mapping_data(images_directory, server_domain, sizes, mapping_file, security_key)
 
     print(f"Image mapping successfully updated in {mapping_file}")
 
