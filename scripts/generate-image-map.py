@@ -56,12 +56,12 @@ def initialize_mapping_file(mapping_file):
 # We are passing size argument as 200x or 200x300 or x400.
 # We need to exctract width and height from size.
 def extract_width_height(size):
-    width = None
-    height = None
+    width = ""
+    height = ""
     parts = size.split('x')
     if len(parts) == 2:
-        width = int(parts[0]) if parts[0] else None
-        height = int(parts[1]) if parts[1] else None
+        width = int(parts[0]) if parts[0] else ""
+        height = int(parts[1]) if parts[1] else ""
     elif len(parts) == 1 and parts[0]:
         if parts[0].isdigit():
             width = int(parts[0])
@@ -74,9 +74,9 @@ def extract_width_height(size):
 def generate_secure_token(width, height, key, path):
     crypto = CryptoURL(key)
     options = {'smart': True, 'image_url': path}
-    if width is not None:
+    if width != "":
         options['width'] = width
-    if height is not None:
+    if height != "":
         options['height'] = height
     return crypto.generate(**options)
 
@@ -89,7 +89,9 @@ def update_mapping_data(images_directory, server_domain, width, height, mapping_
                     image_path = os.path.join(root, file)
                     relative_path = os.path.relpath(image_path, images_directory)
                     secure_token = generate_secure_token(width, height, security_key, f"{server_domain}/{relative_path}")
-                    mapping_data[f"/{relative_path}"] = secure_token
+                    mapping_data[f"/{relative_path}"] = {
+                      f"{width}x{height}": secure_token,
+                    }
         f.seek(0)
         json.dump(mapping_data, f, indent=2)
         f.truncate()
