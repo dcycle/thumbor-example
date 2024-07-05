@@ -109,10 +109,7 @@ In case of issues, you might want to confirm that the unversioned `./.env` file 
 Destroying your environment
 -----
 
-    docker compose down -v
-    rm -f .env
-    rm -f ./website-with-large-image/unversioned-image-mapping.json
-    docker network rm thumbor_example_default_network 2>/dev/null || true
+    ./scripts/destroy.sh
 
 Resources
 -----

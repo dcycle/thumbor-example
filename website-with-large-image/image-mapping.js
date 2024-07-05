@@ -1,13 +1,22 @@
-// script.js
+// Provide a function to map unoptimized-to-optimized image URLs.
+//
+// This script comes from
+// https://github.com/dcycle/thumbor-example/tree/master/website-with-large-image/image-mapping.js.
 
-// Function to load and process image data
-function loadImages() {
+/**
+ * Function to load and process image data
+ *
+ * @param {string} imageServerDomain - The domain of the image server
+ *   For example 'https://images.example.com/' or 'http://localhost:8705/'.
+ * @param {string} imageFileUrl - The URL of the JSON file containing the image
+ *   mapping. For example '/unversioned-image-mapping.json'.
+ */
+function loadImages(imageServerDomain, imageFileUrl) {
   // Select all <img> elements in the document
   const images = document.querySelectorAll('img');
-  const imageServerDomain = document.getElementById("image-server-domain-id").value;
 
   // Fetch the JSON file once
-  fetch('unversioned-image-mapping.json')
+  fetch(imageFileUrl)
       .then(response => {
           if (!response.ok) {
               throw new Error('Failed to fetch JSON');
@@ -20,19 +29,25 @@ function loadImages() {
               // Read data attributes
               const dataSrc = img.getAttribute('data-src');
 
-              // Get optimized image URL from mapping data
-              const optimizedSrc = mappingData[dataSrc];
-
-              if (!optimizedSrc) {
-                  console.error(`Optimized image not found for src: ${dataSrc}`);
-                  return; // Skip this image if optimized src is not found
+              if (!dataSrc) {
+                return;
               }
 
-              // Construct the optimized URL
-              const optimizedURL = `${optimizedSrc}`;
+              // Get optimized image URL from mapping data
+              let optimizedSrc = mappingData[dataSrc];
 
-              // Update img src with optimized URL
-              img.src = imageServerDomain + optimizedURL;
+              if (optimizedSrc) {
+                // Construct the optimized URL
+                const optimizedURL = `${optimizedSrc}`;
+
+                // Update img src with optimized URL
+                img.src = imageServerDomain + optimizedURL;
+              }
+              else {
+                // using imageFileUrl, we cannot map the unoptimized image to
+                // an optimized image. We will use the original image.
+                img.src = dataSrc;
+              }
           });
       })
       .catch(error => {
@@ -40,6 +55,3 @@ function loadImages() {
           // Optionally handle error, e.g., set a fallback image for all images
       });
 }
-
-// Event listener to execute loadImages function when the page is fully loaded
-window.addEventListener('load', loadImages);
