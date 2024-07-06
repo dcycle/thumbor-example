@@ -9,7 +9,7 @@ if [ ! -f ./unversioned/this-is-a-test.json ]; then
   exit 1
 fi
 
-echo "Confirming that all safe url path and signtured generated in unversioned/image-map.json are accessible"
+echo "Confirming that all safe url path and signtures generated in /website-with-large-image/unversioned-image-mapping.json are accessible"
 
 # Note that the second argument is the host and port of the server that will be
 # used to test the URLs. In the case of our test it is 0.0.0.0:8705, however
@@ -20,6 +20,7 @@ echo "Confirming that all safe url path and signtured generated in unversioned/i
 # 0.0.0.0:8705 is accessible through the name "image_optimization" (see the
 # docker-compose.yml file), and this requires that our Docker script be able to
 # access the same network as is used by our docker-compose.yml file.
+
 output=$(docker run -v $(pwd):/app \
   --network thumbor_example_default_network \
   --rm --entrypoint /bin/sh python:3-alpine -c \

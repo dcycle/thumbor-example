@@ -9,13 +9,28 @@
     <p><a href="/index.html">&gt; back home</a></p>
     <h2>Here is an optimized image to 500px wide</h2>
     <!--
-      In this URL, "webserver" corresponds to the name of the web server, as
-      seen by the image server from within the Docker network. The name
-      webserver is defined in ./docker-compose.yml.
-      To understand how we get to "3DW-hfnrLS8eunvhonsNJe6S79I=", please
-      see the section "Where does "3DW-hfnrLS8eunvhonsNJe6S79I=" come from?"
-      in the README.
+      Instead of using the src attribute, we use data-src and data-size attributes, because the loadImages() function, below, will be
+      responsible for loading an optimized version of the image, or, if
+      it does not exist, the original image. Width is the size of the image
+      as displayed to the user, and data-size is the size of the image
+      as requested from the optimization server.
     -->
-    <img src="http://0.0.0.0:8705/3DW-hfnrLS8eunvhonsNJe6S79I=/500x/webserver/large-image.jpg" alt="Columns in courtyard">
+    <img data-src="/large-image.jpg" width="300" data-size="500x" alt="Columns in courtyard">
+    <!--
+      In certain cases, an optimized image cannot be found; in such cases
+      data-size is ignored, and the original image is used. In this case 300px
+      is still the size of the image as displayed to the user.
+    -->
+    <img data-src="/this-unversioned-large-image-is-purposefully-not-mapped.jpg" width="300" data-size="500x" alt="Elderly couple at a tourist attraction">
+    <!--
+    -->
+    <script src="/image-mapping.js"></script>
+    <script>
+      // Event listener to execute loadImages function when the page is fully loaded
+      window.addEventListener('load', function() {
+        // http://0.0.0.0:8705 is the address of the optimization server.
+        loadImages('http://0.0.0.0:8705', '/unversioned-image-mapping.json');
+      })
+    </script>
   </body>
 </html>

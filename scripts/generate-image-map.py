@@ -76,6 +76,14 @@ def extract_size(sizes):
 # Ex:- /v4N0hVTSDSUhTyej8TYfSK2BLfw=/200x0/smart/webserver/img_20230202_121358_113.jpg
 def generate_secure_token(width, height, key, path):
     crypto = CryptoURL(key)
+
+# Smart Cropping¶
+# If the smart mode of thumbor has been specified in the uri (by the /smart portion of it),
+# thumbor will use it’s smart detectors to find focal points.
+# thumbor comes pre-packaged with two focal-point detection algorithms: facial and feature.
+# First it tries to identify faces and if it can’t find any, it tries to identify 
+# features (more on that below).
+# https://thumbor.readthedocs.io/en/latest/detection_algorithms.html
     options = {'smart': True, 'image_url': path}
     if width != "":
         options['width'] = width
