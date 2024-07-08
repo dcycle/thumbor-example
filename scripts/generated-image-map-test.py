@@ -23,17 +23,18 @@ def test_urls(output_json_file, server_domain):
 
     all_accessible = True  # Flag to track if all URLs are accessible
 
-    for unsafe_url_part, secure_url in image_map.items():
-        full_url = f"http://{server_domain}{quote(secure_url)}"
-        try:
-            response = requests.get(full_url)
-            if response.status_code != 200:
+    for unsafe_url_part, sizes in image_map.items():
+        for size, secure_url in sizes.items():
+            full_url = f"http://{server_domain}{quote(secure_url)}"
+            try:
+                response = requests.get(full_url)
+                if response.status_code != 200:
+                    all_accessible = False  # Set flag to False if any exception occurs
+                    print(f"ERROR: URL {full_url} returned status code {response.status_code}")
+                    break  # Stop testing further URLs upon encountering a non-200 status code
+            except requests.exceptions.RequestException as e:
+                print(f"Error accessing URL {full_url}: {str(e)}")
                 all_accessible = False  # Set flag to False if any exception occurs
-                print(f"ERROR: URL {full_url} returned status code {response.status_code}")
-                break  # Stop testing further URLs upon encountering a non-200 status code
-        except requests.exceptions.RequestException as e:
-            print(f"Error accessing URL {full_url}: {str(e)}")
-            all_accessible = False  # Set flag to False if any exception occurs
     if all_accessible:
         print("---- Success: All Images are accessible. ----")
 

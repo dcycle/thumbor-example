@@ -4,8 +4,8 @@
 #
 set -e
 
-if [ ! -f ./website-with-large-image/unversioned-image-mapping.json ]; then
-  echo "./website-with-large-image/unversioned-image-mapping.json not found. Please run the script that generates it (./scripts/generate-image-map.sh) first."
+if [ ! -f ./unversioned/this-is-a-test.json ]; then
+  echo "unversioned/this-is-a-test.json not found. Please run the script that generates it (./scripts/generate-image-map.sh) first."
   exit 1
 fi
 
@@ -24,8 +24,7 @@ echo "Confirming that all safe url path and signtures generated in /website-with
 output=$(docker run -v $(pwd):/app \
   --network thumbor_example_default_network \
   --rm --entrypoint /bin/sh python:3-alpine -c \
-  "pip install requests && python3 /app/scripts/generated-image-map-test.py ./app/website-with-large-image/unversioned-image-mapping.json image_optimization")
-
+  "pip install requests && python3 /app/scripts/generated-image-map-test.py /app/unversioned/this-is-a-test.json image_optimization")
 
 # Check the content of the output
 if echo "$output" | grep -q "400"; then
