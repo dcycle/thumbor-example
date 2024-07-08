@@ -43,7 +43,7 @@ echo "Generate unoptimized-to-optimized image map"
 source .env
 rm -f ./website-with-large-image/this-unversioned-large-image-is-purposefully-not-mapped.jpg
 export THUMBOR_SECURITY_KEY="$THUMBOR_SECURITY_KEY"
-./scripts/generate-image-map.sh ./app/website-with-large-image webserver 200x ./app/website-with-large-image/unversioned-image-mapping.json
+./scripts/generate-image-map.sh ./app/website-with-large-image webserver 200x,500x ./app/website-with-large-image/unversioned-image-mapping.json
 cp ./website-with-large-image/large-image.jpg ./website-with-large-image/this-unversioned-large-image-is-purposefully-not-mapped.jpg
 
 echo " => "
