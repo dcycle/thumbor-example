@@ -10,8 +10,9 @@
  *   For example 'https://images.example.com/' or 'http://localhost:8705/'.
  * @param {string} imageFileUrl - The URL of the JSON file containing the image
  *   mapping. For example '/unversioned-image-mapping.json'.
+ * @param {string} imageSize - Image size For example '200x', '500x200', 'x250'.
  */
-function loadImages(imageServerDomain, imageFileUrl) {
+function loadImages(imageServerDomain, imageFileUrl, imageSize) {
   // Select all <img> elements in the document
   const images = document.querySelectorAll('img');
 
@@ -36,9 +37,10 @@ function loadImages(imageServerDomain, imageFileUrl) {
               // Get optimized image URL from mapping data
               let optimizedSrc = mappingData[dataSrc];
 
-              if (optimizedSrc) {
+              if (optimizedSrc && optimizedSrc[imageSize]) {
+                secureurlpart = optimizedSrc[imageSize]
                 // Construct the optimized URL
-                const optimizedURL = `${optimizedSrc}`;
+                const optimizedURL = `${secureurlpart}`;
 
                 // Update img src with optimized URL
                 img.src = imageServerDomain + optimizedURL;
