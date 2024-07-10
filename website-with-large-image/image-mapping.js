@@ -12,7 +12,7 @@
  *   mapping. For example '/unversioned-image-mapping.json'.
  * @param {string} imageSize - Image size For example '200x', '500x200', 'x250'.
  */
-function loadImages(imageServerDomain, imageFileUrl, imageSize) {
+function loadImages(imageServerDomain, imageFileUrl) {
   // Select all <img> elements in the document
   const images = document.querySelectorAll('img');
 
@@ -29,6 +29,7 @@ function loadImages(imageServerDomain, imageFileUrl, imageSize) {
           images.forEach(img => {
               // Read data attributes
               const dataSrc = img.getAttribute('data-src');
+              const dataSize = img.getAttribute('data-size');
 
               if (!dataSrc) {
                 return;
@@ -37,8 +38,8 @@ function loadImages(imageServerDomain, imageFileUrl, imageSize) {
               // Get optimized image URL from mapping data
               let optimizedSrc = mappingData[dataSrc];
 
-              if (optimizedSrc && optimizedSrc[imageSize]) {
-                secureurlpart = optimizedSrc[imageSize]
+              if (optimizedSrc && optimizedSrc[dataSize]) {
+                const secureurlpart = optimizedSrc[dataSize]
                 // Construct the optimized URL
                 const optimizedURL = `${secureurlpart}`;
 
