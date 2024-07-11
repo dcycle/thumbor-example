@@ -34,7 +34,7 @@ export THUMBOR_SECURITY_KEY="$THUMBOR_SECURITY_KEY"
 
 ./scripts/generate-image-map.sh ./app/website-with-large-image webserver 200x ./app/unversioned/this-is-a-test2.json
 
-./scripts/generate-image-map.sh ./app/website-with-large-image webserver 500x ./app/website-with-large-image/unversioned-image-mapping.json
+./scripts/generate-image-map.sh ./app/website-with-large-image webserver 200x,x500,200x500,300x200 ./app/website-with-large-image/unversioned-image-mapping.json
 
 echo "Confirming that the unoptimized-to-optimized script works as expected"
 
