@@ -129,21 +129,21 @@ Verify merging files:-
  *   RUN ./scripts/deploy.sh
 
  *   Generate image mapping for media folder
-    ```
+```
     ./scripts/generate-image-map.sh /app/media localhost:4000 500x ./app/unversioned/test-media.json
-    ```
+```
 
  *   Generate image mapping for images folder
-    ```
+```
     ./scripts/generate-image-map.sh /app/images localhost:4000 500x ./app/unversioned/test-images.json
-    ```
+```
 
  *   Merge test-media.json and test-images.json files.
-    ```
+```
     ./scripts/merge-image-map-json-files.sh \
     ./app/unversioned/test-media.json,./app/unversioned/test-images.json \
     ./app/unversioned/test-media-latest-images.json
-    ```
+```
 
  *** ./app/unversioned/test-media.json,./app/unversioned/test-images.json are deleted *** and
     you will find output at app/unversioned/test-media-latest-images.json file.
