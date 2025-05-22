@@ -118,6 +118,10 @@ In beta sites https://beta.terredesjeunes.org/ we have images loading from media
 to generate image mapping files from both the directory and run the commands to merge the output json files in there
 respective repository finally the output file will be available in image server.
 
+And also if we have many image sizes 800x,x680,600x,75x75,20x,400x400... to optimize then its better to generate
+image optimization for 3 sizes at one ex:- 800x,x680,600x first, then 75x75,20x,400x400 ... and so on otherwise
+scripts breaks or jenkins takes more time to complete. later you can merge all those images mapping json file as suggested below.
+
 Verify merging files:-
 
  *   create media and images directory in project root directory.
