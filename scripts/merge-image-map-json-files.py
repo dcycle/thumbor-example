@@ -90,7 +90,6 @@ def main():
     *input_files, output_file = sys.argv[1:]
     # First argument is comma-separated input file list
     input_files = sys.argv[1].split(',')
-
     # Second argument is the output file
     output_file = sys.argv[2]
 
@@ -98,6 +97,11 @@ def main():
     if len(input_files) < 2:
         print("❌ Please provide at least two input files to merge.")
         sys.exit(1)
+
+    print("input_files")
+    print(input_files)
+    print("output_file")
+    print(output_file)
 
     merge_multiple_json_files(input_files, output_file)
 
