@@ -18,6 +18,7 @@ import os
 import sys
 import json
 from dotenv import load_dotenv
+from itertools import islice
 from libthumbor import CryptoURL
 
 def check_arguments():
@@ -91,23 +92,93 @@ def generate_secure_token(width, height, key, path):
         options['height'] = height
     return crypto.generate(**options)
 
-def update_mapping_data(images_directory, server_domain, sizes, mapping_file, security_key):
+def chunked_iterator(iterable, batch_size):
+    """Yield successive batches of items from an iterator."""
+    it = iter(iterable)
+    while True:
+        chunk = list(islice(it, batch_size))
+        if not chunk:
+            break
+        yield chunk
+
+def update_mapping_data(images_directory, server_domain, sizes, mapping_file, security_key, batch_size=100):
+    """
+    Updates a JSON mapping file with secure tokens for image resizing endpoints.
+
+    This function scans all image files within the specified directory, processes them in batches, and
+    generates secure tokens for each specified image size. The mapping is saved to a JSON file, allowing
+    secure, dynamic resizing or delivery of images via a server.
+
+    Parameters:
+        images_directory (str):
+            Path to the directory containing images to be mapped.
+
+        server_domain (str):
+            The base domain or URL prefix used to construct secure image URLs (e.g., "localhost:4000/media").
+
+        sizes (str):
+            A comma-separated string specifying image dimensions (e.g., "800x,x600,400x300").
+            Each entry can be:
+                - WxH (e.g., "800x600")
+                - Wx (width only, e.g., "800x")
+                - xH (height only, e.g., "x600")
+
+        mapping_file (str):
+            Path to the JSON file where the mapping data will be stored. If the file doesn't exist, it is created.
+
+        security_key (str):
+            A secret key used to generate secure tokens (e.g., HMAC or hash-based).
+
+        batch_size (int, optional):
+            Number of images to process in a single batch to avoid memory/resource issues. Default is 100.
+
+    Notes:
+        - Only image files with extensions (.jpg, .jpeg, .png, .gif, .bmp, .tiff) are processed.
+        - If an image mapping already exists in the file, new sizes are added without overwriting existing ones.
+        - This function is suitable for large image folders by using incremental processing.
+
+    Raises:
+        JSONDecodeError: If the mapping file exists but contains invalid JSON.
+
+    Example:
+        update_mapping_data(
+            images_directory='./media',
+            server_domain='localhost:4000/media',
+            sizes='800x,x600,400x300',
+            mapping_file='./mapping.json',
+            security_key='my-secret',
+            batch_size=100
+        )
+    """
+    # Step 1: Load existing mapping
     with open(mapping_file, 'r+') as f:
-        mapping_data = json.load(f)
+        try:
+            mapping_data = json.load(f)
+        except json.JSONDecodeError:
+            mapping_data = {}
+
+        # Step 2: Gather all image paths
+        image_paths = []
         for root, _, files in os.walk(images_directory):
             for file in files:
                 if file.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tiff')):
                     image_path = os.path.join(root, file)
-                    relative_path = os.path.relpath(image_path, images_directory)
-                    mapping_data[f"/{relative_path}"] = {}
-                    for size in extract_size(sizes):
-                        width, height = extract_width_height(size)
-                        secure_token = generate_secure_token(width, height, security_key, f"{server_domain}/{relative_path}")
-                        mapping_data[f"/{relative_path}"].update(
-                          {
-                            f"{width}x{height}": secure_token,
-                          }
-                        )
+                    image_paths.append(image_path)
+
+        # Step 3: Process in batches
+        for batch in chunked_iterator(image_paths, batch_size):
+            for image_path in batch:
+                relative_path = os.path.relpath(image_path, images_directory)
+                map_key = f"/{relative_path}"
+                if map_key not in mapping_data:
+                    mapping_data[map_key] = {}
+
+                for size in extract_size(sizes):
+                    width, height = extract_width_height(size)
+                    secure_token = generate_secure_token(width, height, security_key, f"{server_domain}/{relative_path}")
+                    mapping_data[map_key][f"{width}x{height}"] = secure_token
+
+        # Step 4: Save final mapping
         f.seek(0)
         json.dump(mapping_data, f, indent=2)
         f.truncate()

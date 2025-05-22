@@ -111,6 +111,43 @@ Destroying your environment
 
     ./scripts/destroy.sh
 
+Merge json files
+-----
+
+In beta sites https://beta.terredesjeunes.org/ we have images loading from media and images directory . we are going
+to generate image mapping files from both the directory and run the commands to merge the output json files in there
+respective repository finally the output file will be available in image server.
+
+Verify merging files:-
+
+ *   create media and images directory in project root directory.
+
+ *   add few large files into both the directory.
+
+ *   cp env-example file to .env
+
+ *   RUN ./scripts/deploy.sh
+
+ *   Generate image mapping for media folder
+```
+    ./scripts/generate-image-map.sh /app/media localhost:4000 500x ./app/unversioned/test-media.json
+```
+
+ *   Generate image mapping for images folder
+```
+    ./scripts/generate-image-map.sh /app/images localhost:4000 500x ./app/unversioned/test-images.json
+```
+
+ *   Merge test-media.json and test-images.json files.
+```
+    ./scripts/merge-image-map-json-files.sh \
+    ./app/unversioned/test-media.json,./app/unversioned/test-images.json \
+    ./app/unversioned/test-media-latest-images.json
+```
+
+ *** ./app/unversioned/test-media.json,./app/unversioned/test-images.json are deleted *** and
+    you will find output at app/unversioned/test-media-latest-images.json file.
+
 Resources
 -----
 * [Use image CDNs to optimize images, by Jeremy Wagner et al., 2019-08-14, on web.dev](https://web.dev/articles/image-cdns)
