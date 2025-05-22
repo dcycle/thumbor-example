@@ -120,32 +120,32 @@ respective repository finally the output file will be available in image server.
 
 Verify merging files:-
 
-    create media and images directory in project root directory.
+ *   create media and images directory in project root directory.
 
-    add few large files into both the directory.
+ *   add few large files into both the directory.
 
-    cp env-example file to .env
+ *   cp env-example file to .env
 
-    RUN ./scripts/deploy.sh
+ *   RUN ./scripts/deploy.sh
 
-    * generate image mapping for media folder
+ *   Generate image mapping for media folder
     ```
     ./scripts/generate-image-map.sh /app/media localhost:4000 500x ./app/unversioned/test-media.json
     ```
 
-    * generate image mapping for images folder
+ *   Generate image mapping for images folder
     ```
     ./scripts/generate-image-map.sh /app/images localhost:4000 500x ./app/unversioned/test-images.json
     ```
 
-    * merge test-media.json and test-images.json files.
+ *   Merge test-media.json and test-images.json files.
     ```
     ./scripts/merge-image-map-json-files.sh \
     ./app/unversioned/test-media.json,./app/unversioned/test-images.json \
     ./app/unversioned/test-media-latest-images.json
     ```
 
-    *** ./app/unversioned/test-media.json,./app/unversioned/test-images.json are deleted *** and
+ *** ./app/unversioned/test-media.json,./app/unversioned/test-images.json are deleted *** and
     you will find output at app/unversioned/test-media-latest-images.json file.
 
 Resources
