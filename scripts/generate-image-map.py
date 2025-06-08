@@ -21,8 +21,8 @@ from dotenv import load_dotenv
 from libthumbor import CryptoURL
 
 def check_arguments():
-    if len(sys.argv) != 5:
-        print("Usage: python3 generate-image-map.py <images_directory> <server_domain> <size> <mapping_file>")
+    if len(sys.argv) < 5 or len(sys.argv) > 6:
+        print("Usage: python3 generate-image-map.py <images_directory> <server_domain> <size> <mapping_file> [<filter-format>]")
         sys.exit(1)
 
 def load_environment_variables():
@@ -91,7 +91,7 @@ def generate_secure_token(width, height, key, path):
         options['height'] = height
     return crypto.generate(**options)
 
-def update_mapping_data(images_directory, server_domain, sizes, mapping_file, security_key):
+def update_mapping_data(images_directory, server_domain, sizes, mapping_file, security_key, filter_format):
     with open(mapping_file, 'r+') as f:
         mapping_data = json.load(f)
         for root, _, files in os.walk(images_directory):
@@ -102,7 +102,18 @@ def update_mapping_data(images_directory, server_domain, sizes, mapping_file, se
                     mapping_data[f"/{relative_path}"] = {}
                     for size in extract_size(sizes):
                         width, height = extract_width_height(size)
-                        secure_token = generate_secure_token(width, height, security_key, f"{server_domain}/{relative_path}")
+
+                        if filter_format != "":
+                            secure_token = generate_secure_token(
+                                width, height, security_key,
+                                f"filters:format({filter_format})/{server_domain}/{relative_path}"
+                            )
+                        else:
+                            secure_token = generate_secure_token(
+                                width, height, security_key,
+                                f"{server_domain}/{relative_path}"
+                            )
+
                         mapping_data[f"/{relative_path}"].update(
                           {
                             f"{width}x{height}": secure_token,
@@ -118,12 +129,13 @@ def main():
     server_domain = sys.argv[2]
     sizes = sys.argv[3]
     mapping_file = sys.argv[4]
+    filter_format = sys.argv[5] if len(sys.argv) == 6 else ""
 
     security_key = load_environment_variables()
     validate_images_directory(images_directory)
     initialize_mapping_file(mapping_file)
 
-    update_mapping_data(images_directory, server_domain, sizes, mapping_file, security_key)
+    update_mapping_data(images_directory, server_domain, sizes, mapping_file, security_key, filter_format)
 
     print(f"Image mapping successfully updated in {mapping_file}")
 
