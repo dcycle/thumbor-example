@@ -97,6 +97,9 @@ Here is how to use a Dockerized version of that script:
     export THUMBOR_SECURITY_KEY=your_thumbor_security_key_here
     ./generate-image-map.sh ./ webserver 500x ./unversioned/test.json
 
+    # if you want to force filter format for example webp then
+    ./generate-image-map.sh ./ webserver 500x ./unversioned/test.json webp
+
 Updating your environment
 -----
 

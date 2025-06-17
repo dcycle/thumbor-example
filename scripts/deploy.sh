@@ -30,7 +30,7 @@ OPTIMIZATION=$(docker compose port image_optimization 80)
 source ./scripts/lib/generate_thumbor_secure_url.source.sh
 
 # Example unsafe URL part
-unsafe_url_part="500x/webserver/large-image.jpg"
+unsafe_url_part="500x/smart/filters:format(webp)/webserver/large-image.jpg"
 key=$THUMBOR_SECURITY_KEY
 
 # Generate secure URL
